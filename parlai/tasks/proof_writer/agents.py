@@ -21,7 +21,7 @@ import random
 import re
 from typing import Optional, List, Tuple
 
-from tasks.reasoning.agents import StepByStepReasoningTeacher
+from parlai.tasks.reasoning.agents import StepByStepReasoningTeacher
 
 from .build import build
 from parlai.core.message import Message

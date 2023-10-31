@@ -18,7 +18,7 @@ from parlai.core.opt import Opt
 from parlai.core.params import ParlaiParser
 from typing import Optional
 
-from tasks.reasoning.agents import MWPStepsReasoningTeacher
+from parlai.tasks.reasoning.agents import MWPStepsReasoningTeacher
 
 
 class ASDivStepByStepReasoningTeacher(MWPStepsReasoningTeacher):

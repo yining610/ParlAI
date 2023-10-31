@@ -23,7 +23,7 @@ from parlai.core.params import ParlaiParser
 from parlai.utils.io import PathManager
 from typing import List, Optional
 
-from tasks.reasoning.agents import StepByStepReasoningTeacher
+from parlai.tasks.reasoning.agents import StepByStepReasoningTeacher
 import random
 
 
