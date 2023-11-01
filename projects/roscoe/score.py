@@ -45,6 +45,7 @@ except ImportError:
         "Scorer needs SimCSE model installed. \n " "pip install -U simcse"
     )
 
+CACHE_DIR = "/scratch/ylu130/model-hf"
 SENT_TRANS = "sentence_transformer"
 SIMSCE = "sim_sce"
 SEQ_EMB_MODEL_TYPES = [SENT_TRANS, SIMSCE]
@@ -291,14 +292,15 @@ class Evaluator:
             )
             # Load model from HuggingFace Hub
             if self.word_model_name:
-                self.tokenizer = AutoTokenizer.from_pretrained(self.word_model_name)
-                self.model = AutoModel.from_pretrained(self.word_model_name)
+                self.tokenizer = AutoTokenizer.from_pretrained(self.word_model_name, cache_dir=CACHE_DIR)
+                self.model = AutoModel.from_pretrained(self.word_model_name, cache_dir=CACHE_DIR)
                 self.model.eval().to(self.device)
         if contains_nli_scores(score_types):
             # Load model for NLI-type predictions
-            self.nli_tokenizer = AutoTokenizer.from_pretrained(nli_model)
+            self.nli_tokenizer = AutoTokenizer.from_pretrained(nli_model, cache_dir=CACHE_DIR)
             self.nli_model = AutoModelForSequenceClassification.from_pretrained(
-                nli_model
+                nli_model,
+                cache_dir=CACHE_DIR
             )
             self.nli_model.eval().to(self.device)
             self.discourse_batch = discourse_batch
@@ -355,7 +357,7 @@ class Evaluator:
             and sentence_embedding_model in TRANSFORMER_MODELS_DICT.keys()
         ):
             # Load model from HuggingFace Hub
-            model = SentenceTransformer(sentence_embedding_model)
+            model = SentenceTransformer(sentence_embedding_model, cache_folder=CACHE_DIR)
             model.eval().to(self.device)
             return (
                 model,
@@ -370,21 +372,21 @@ class Evaluator:
     def _build_ppl_model(
         self, model_id: str
     ) -> Tuple[PreTrainedModel, PreTrainedTokenizer]:
-        tokenizer = AutoTokenizer.from_pretrained(model_id, add_prefix_space=True)
+        tokenizer = AutoTokenizer.from_pretrained(model_id, add_prefix_space=True, cache_dir=CACHE_DIR)
         if tokenizer.pad_token is None:
             # GPT2 doesn't have a pad token. This hack allows for padding a batch of tensors,
             # and the attention mask will exclude the pad tokens from the loss.
             tokenizer.pad_token = tokenizer.eos_token
-        model = AutoModelForCausalLM.from_pretrained(model_id).eval().to(self.device)
+        model = AutoModelForCausalLM.from_pretrained(model_id, cache_dir=CACHE_DIR).eval().to(self.device)
         return model, tokenizer
 
     def _build_grammaticality_classifier(
         self,
         model_id: str,
     ) -> Tuple[PreTrainedModel, PreTrainedTokenizer]:
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(model_id, cache_dir=CACHE_DIR)
         model = (
-            AutoModelForSequenceClassification.from_pretrained(model_id)
+            AutoModelForSequenceClassification.from_pretrained(model_id, cache_dir=CACHE_DIR)
             .eval()
             .to(self.device)
         )
